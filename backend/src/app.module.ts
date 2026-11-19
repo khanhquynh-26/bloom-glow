@@ -20,9 +20,13 @@ import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
 import { AiGiftStudioModule } from './ai-gift-studio/ai-gift-studio.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { CategoriesModule } from './categories/categories.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { AddressesModule } from './addresses/addresses.module';
 
 @Module({
-  imports: [ProductsModule, ProductVariantsModule, ProductImagesModule, CollectionsModule, GiftSetsModule, CartsModule, WishlistsModule, CouponsModule, OrdersModule, PaymentsModule, InventoryModule, ReviewsModule, SearchModule, UserEventsModule, RecommendationsModule, AiAssistantModule, AiGiftStudioModule, AnalyticsModule, NotificationsModule],
+  imports: [ProductsModule, ProductVariantsModule, ProductImagesModule, CollectionsModule, GiftSetsModule, CartsModule, WishlistsModule, CouponsModule, OrdersModule, PaymentsModule, InventoryModule, ReviewsModule, SearchModule, UserEventsModule, RecommendationsModule, AiAssistantModule, AiGiftStudioModule, AnalyticsModule, NotificationsModule, CategoriesModule, AuthModule, UsersModule, AddressesModule],
   controllers: [AppController],
   providers: [AppService],
 })
