@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 
@@ -8,6 +9,9 @@ import CartPage from '../pages/CartPage';
 import CollectionsPage from '../pages/CollectionsPage';
 import CollectionDetailPage from '../pages/CollectionDetailPage';
 import WishlistPage from '../pages/WishlistPage';
+import LoginPage from '../pages/LoginPage';
+import RegisterPage from '../pages/RegisterPage';
+import ForgotPasswordPage from '../pages/ForgotPasswordPage';
 import NotFoundPage from '../pages/NotFoundPage';
 
 function AppRoutes() {
@@ -22,14 +26,7 @@ function AppRoutes() {
             </MainLayout>
           }
         />
-<Route
-  path="/products"
-  element={
-    <MainLayout>
-      <ProductsPage />
-    </MainLayout>
-  }
-/>  
+
         <Route
           path="/products"
           element={
@@ -80,6 +77,33 @@ function AppRoutes() {
           element={
             <MainLayout>
               <WishlistPage />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/login"
+          element={
+            <MainLayout>
+              <LoginPage />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <MainLayout>
+              <RegisterPage />
+            </MainLayout>
+          }
+        />
+
+        <Route
+          path="/forgot-password"
+          element={
+            <MainLayout>
+              <ForgotPasswordPage />
             </MainLayout>
           }
         />
