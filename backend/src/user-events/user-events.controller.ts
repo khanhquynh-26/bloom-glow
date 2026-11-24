@@ -1,22 +1,38 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { CreateUserEventDto, UserEventRecord, UserEventsService } from './user-events.service';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { IsInt, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { UserEventsService } from './user-events.service';
+
+export class CreateUserEventDto {
+  @IsInt()
+  @Type(() => Number)
+  userId!: number;
+
+  @IsString()
+  eventType!: string;
+
+  @IsOptional()
+  @IsInt()
+  @Type(() => Number)
+  productId?: number;
+}
 
 @Controller('user-events')
 export class UserEventsController {
   constructor(private readonly userEventsService: UserEventsService) {}
 
   @Post()
-  create(@Body() dto: CreateUserEventDto): UserEventRecord {
-    return this.userEventsService.create(dto);
+  create(@Body() dto: CreateUserEventDto) {
+    return this.userEventsService.track(dto);
   }
 
   @Get()
-  findAll(): UserEventRecord[] {
-    return this.userEventsService.findAll();
-  }
-
-  @Get('user/:userId')
-  findByUser(@Param('userId') userId: string): UserEventRecord[] {
-    return this.userEventsService.findByUser(Number(userId));
+  findAll(@Query('userId') userId?: string) {
+    const parsedUserId = userId !== undefined ? Number(userId) : undefined;
+    return this.userEventsService.findAll(
+      parsedUserId !== undefined && !Number.isNaN(parsedUserId)
+        ? parsedUserId
+        : undefined,
+    );
   }
 }

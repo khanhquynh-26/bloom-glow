@@ -1,45 +1,43 @@
 import { Injectable } from '@nestjs/common';
 
-export type UserEventType = 'view' | 'search' | 'add_to_cart' | 'purchase';
-
-export class UserEventRecord {
-  id!: number;
-  userId!: number;
+export interface TrackUserEventInput {
+  userId: number;
+  eventType: string;
   productId?: number;
-  keyword?: string;
-  eventType!: UserEventType;
-  createdAt!: string;
+  metadata?: Record<string, unknown>;
 }
 
-export class CreateUserEventDto {
-  userId?: number;
-  productId?: number;
-  keyword?: string;
-  eventType!: UserEventType;
+export interface UserEventRecord extends TrackUserEventInput {
+  id: number;
+  createdAt: Date;
 }
 
 @Injectable()
 export class UserEventsService {
-  private events: UserEventRecord[] = [];
+  private readonly events: UserEventRecord[] = [];
+  private nextId = 1;
 
-  create(dto: CreateUserEventDto): UserEventRecord {
-    const newEvent: UserEventRecord = {
-      id: this.events.length + 1,
-      userId: dto.userId ?? 1,
-      productId: dto.productId,
-      keyword: dto.keyword,
-      eventType: dto.eventType,
-      createdAt: new Date().toISOString(),
+  track(input: TrackUserEventInput): UserEventRecord {
+    const record: UserEventRecord = {
+      id: this.nextId++,
+      userId: input.userId,
+      eventType: input.eventType,
+      productId: input.productId,
+      metadata: input.metadata,
+      createdAt: new Date(),
     };
-    this.events.push(newEvent);
-    return newEvent;
+    this.events.push(record);
+    return record;
   }
 
-  findAll(): UserEventRecord[] {
-    return this.events;
+  findAll(userId?: number): UserEventRecord[] {
+    if (userId === undefined) {
+      return [...this.events];
+    }
+    return this.events.filter((item) => item.userId === userId);
   }
 
   findByUser(userId: number): UserEventRecord[] {
-    return this.events.filter((e) => e.userId === Number(userId));
+    return this.events.filter((item) => item.userId === Number(userId));
   }
 }

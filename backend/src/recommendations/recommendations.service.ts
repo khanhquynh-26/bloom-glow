@@ -11,6 +11,8 @@ export interface RecommendProduct {
   categoryId: number;
   imageUrl: string;
   status: 'active' | 'inactive';
+  createdAt: string;
+  updatedAt: string;
 }
 
 @Injectable()
@@ -27,10 +29,16 @@ export class RecommendationsService {
     if (!target) return [];
 
     const sameCategory = sourceProducts.filter(
-      (p) => p.id !== Number(productId) && p.status === 'active' && p.categoryId === target.categoryId,
+      (p) =>
+        p.id !== Number(productId) &&
+        p.status === 'active' &&
+        p.categoryId === target.categoryId,
     );
     const others = sourceProducts.filter(
-      (p) => p.id !== Number(productId) && p.status === 'active' && p.categoryId !== target.categoryId,
+      (p) =>
+        p.id !== Number(productId) &&
+        p.status === 'active' &&
+        p.categoryId !== target.categoryId,
     );
     return [...sameCategory, ...others].slice(0, 3);
   }
@@ -41,17 +49,23 @@ export class RecommendationsService {
   ): RecommendProduct[] {
     const userEvents = this.userEventsService.findByUser(userId);
     const interactedProductIds = new Set(
-      userEvents.map((e) => e.productId).filter((id): id is number => typeof id === 'number'),
+      userEvents
+        .map((e) => e.productId)
+        .filter((id): id is number => typeof id === 'number'),
     );
 
     const preferredCategories = new Set(
-      sourceProducts.filter((p) => interactedProductIds.has(p.id)).map((p) => p.categoryId),
+      sourceProducts
+        .filter((p) => interactedProductIds.has(p.id))
+        .map((p) => p.categoryId),
     );
 
     const matched = sourceProducts.filter(
       (p) => p.status === 'active' && preferredCategories.has(p.categoryId),
     );
 
-    return matched.length > 0 ? matched : sourceProducts.filter((p) => p.status === 'active').slice(0, 4);
+    return matched.length > 0
+      ? matched
+      : sourceProducts.filter((p) => p.status === 'active').slice(0, 4);
   }
 }
