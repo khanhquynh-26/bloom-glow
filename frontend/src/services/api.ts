@@ -26,8 +26,8 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('bloom_token');
-      localStorage.removeItem('bloom_user');
+      // Không tự động xóa token ở đây.
+      // AuthContext quản lý trạng thái đăng nhập.
     }
 
     return Promise.reject(error);

@@ -1,13 +1,13 @@
 
 import api from './api';
 
-// export interface Category {
-//   id: number;
-//   name: string;
-//   slug: string;
-//   description: string;
-// }
-import type { Category } from '../types';
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+}
+// import type { Category } from '../types';
 const categoriesService = {
   async getAll(): Promise<Category[]> {
     const response = await api.get<Category[]>('/categories');

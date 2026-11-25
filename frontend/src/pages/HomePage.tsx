@@ -14,6 +14,7 @@ import productsService from '../services/products.service';
 import type { Product } from '../types/product.types';
 import { formatCurrency } from '../utils/formatCurrency';
 import Loading from '../components/common/Loading';
+import RecommendedProducts from '../components/product/RecommendedProducts';
 
 const categories = [
   {

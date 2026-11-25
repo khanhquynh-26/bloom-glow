@@ -27,13 +27,17 @@ function LoginPage() {
     try {
       setLoading(true);
 
-      const response = await authService.login({
-        email: email.trim(),
-        password,
-      });
+const response = await authService.login({
+  email: email.trim(),
+  password,
+});
 
-      login(response.user, response.accessToken);
-      navigate('/');
+if (!response.accessToken || !response.user) {
+  throw new Error('Backend trả về dữ liệu đăng nhập không hợp lệ');
+}
+
+login(response.user, response.accessToken);
+navigate('/');
     } catch (err: any) {
       setError(
         err.response?.data?.message ||

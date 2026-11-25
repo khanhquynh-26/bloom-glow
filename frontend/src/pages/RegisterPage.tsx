@@ -45,16 +45,21 @@ function RegisterPage() {
     try {
       setLoading(true);
 
-      const response = await authService.register({
-        fullName: fullName.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-        password,
-      });
+const response = await authService.register({
+  fullName: fullName.trim(),
+  email: email.trim(),
+  phone: phone.trim(),
+  password,
+});
 
-      login(response.user, response.accessToken);
-      navigate('/');
-    } catch (err: any) {
+if (!response.accessToken || !response.user) {
+  throw new Error('Backend trả về dữ liệu đăng ký không hợp lệ');
+}
+
+login(response.user, response.accessToken);
+navigate('/');
+    } 
+    catch (err: any) {
       setError(
         err.response?.data?.message ||
         'Đăng ký thất bại. Vui lòng thử lại.'

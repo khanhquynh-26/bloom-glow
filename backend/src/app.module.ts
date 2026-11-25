@@ -1,5 +1,9 @@
+
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
+import { DatabaseModule } from './database/database.module';
+
 import { AddressesModule } from './addresses/addresses.module';
 import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
 import { AiGiftStudioModule } from './ai-gift-studio/ai-gift-studio.module';
@@ -7,7 +11,6 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { AuthModule } from './auth/auth.module';
 import { CartsModule } from './carts/carts.module';
 import { CouponsModule } from './coupons/coupons.module';
-import { DatabaseModule } from './database/database.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { OrdersModule } from './orders/orders.module';
@@ -18,18 +21,27 @@ import { SearchModule } from './search/search.module';
 import { UserEventsModule } from './user-events/user-events.module';
 import { UsersModule } from './users/users.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
-
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
+
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
 
+    // Database
+    DatabaseModule,
+
+    // Products and categories
     CategoriesModule,
     ProductsModule,
-    DatabaseModule,
+
+    // Users and authentication
     UsersModule,
     AuthModule,
+
+    // Business modules
     AddressesModule,
     CartsModule,
     OrdersModule,
@@ -39,8 +51,12 @@ import { ProductsModule } from './products/products.module';
     InventoryModule,
     ReviewsModule,
     NotificationsModule,
+
+    // AI modules
     AiAssistantModule,
     AiGiftStudioModule,
+
+    // Other modules
     AnalyticsModule,
     RecommendationsModule,
     SearchModule,
