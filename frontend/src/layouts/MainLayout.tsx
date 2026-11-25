@@ -1,6 +1,8 @@
+
 import type { ReactNode } from 'react';
 import Header from '../components/header/Header';
 import Footer from '../components/footer/Footer';
+import AIChatWidget from '../components/chat/AIChatWidget';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -16,6 +18,9 @@ function MainLayout({ children }: MainLayoutProps) {
       </main>
 
       <Footer />
+
+      {/* Chatbot AI hiển thị trên các trang sử dụng MainLayout */}
+      <AIChatWidget />
     </div>
   );
 }
