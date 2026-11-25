@@ -7,23 +7,18 @@ import { ProductsRepository } from './products.repository';
 
 import { ProductEntity } from './entities/product.entity';
 import { CategoryEntity } from '../categories/entities/category.entity';
+import { ProductImageEntity } from '../product-images/entities/product-image.entity';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
             ProductEntity,
             CategoryEntity,
+            ProductImageEntity,
         ]),
     ],
-    controllers: [
-        ProductsController,
-    ],
-    providers: [
-        ProductsService,
-        ProductsRepository,
-    ],
-    exports: [
-        ProductsService,
-    ],
+    controllers: [ProductsController],
+    providers: [ProductsService, ProductsRepository],
+    exports: [ProductsService],
 })
-export class ProductsModule {}
+export class ProductsModule { }

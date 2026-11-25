@@ -18,7 +18,7 @@ export class ProductsRepository {
 
     findAll() {
         return this.repository.find({
-            relations: ['category'],
+            relations: ['category', 'images'],
             order: {
                 id: 'DESC',
             },
@@ -28,7 +28,7 @@ export class ProductsRepository {
     findById(id: number) {
         return this.repository.findOne({
             where: { id },
-            relations: ['category'],
+            relations: ['category', 'images'],
         });
     }
 
@@ -58,7 +58,7 @@ export class ProductsRepository {
 
         const [items, total] = await this.repository.findAndCount({
             where,
-            relations: ['category'],
+            relations: ['category', 'images'],
             order: {
                 id: 'DESC',
             },

@@ -18,15 +18,23 @@ import { SearchModule } from './search/search.module';
 import { UserEventsModule } from './user-events/user-events.module';
 import { UsersModule } from './users/users.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
+import { ProductImagesModule } from './product-images/product-images.module';
 
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
+import { ProductVariantsModule } from './product-variants/product-variants.module';
+import { CollectionsModule } from './collections/collections.module';
+import { GiftSetsModule } from './gift-sets/gift-sets.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
 
+    GiftSetsModule,
     CategoriesModule,
     ProductsModule,
+    CollectionsModule,
+    ProductImagesModule,
+    ProductVariantsModule,
     DatabaseModule,
     UsersModule,
     AuthModule,
