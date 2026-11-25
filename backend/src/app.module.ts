@@ -1,5 +1,9 @@
+
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+
+import { DatabaseModule } from './database/database.module';
+
 import { AddressesModule } from './addresses/addresses.module';
 import { AiAssistantModule } from './ai-assistant/ai-assistant.module';
 import { AiGiftStudioModule } from './ai-gift-studio/ai-gift-studio.module';
@@ -7,7 +11,6 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { AuthModule } from './auth/auth.module';
 import { CartsModule } from './carts/carts.module';
 import { CouponsModule } from './coupons/coupons.module';
-import { DatabaseModule } from './database/database.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { OrdersModule } from './orders/orders.module';
@@ -18,26 +21,37 @@ import { SearchModule } from './search/search.module';
 import { UserEventsModule } from './user-events/user-events.module';
 import { UsersModule } from './users/users.module';
 import { WishlistsModule } from './wishlists/wishlists.module';
-import { ProductImagesModule } from './product-images/product-images.module';
 
+// Product modules
 import { CategoriesModule } from './categories/categories.module';
 import { ProductsModule } from './products/products.module';
+import { ProductImagesModule } from './product-images/product-images.module';
 import { ProductVariantsModule } from './product-variants/product-variants.module';
 import { CollectionsModule } from './collections/collections.module';
 import { GiftSetsModule } from './gift-sets/gift-sets.module';
+
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
 
-    GiftSetsModule,
+    // Database
+    DatabaseModule,
+
+    // Products and categories
     CategoriesModule,
     ProductsModule,
-    CollectionsModule,
     ProductImagesModule,
     ProductVariantsModule,
-    DatabaseModule,
+    CollectionsModule,
+    GiftSetsModule,
+
+    // Users and authentication
     UsersModule,
     AuthModule,
+
+    // Business modules
     AddressesModule,
     CartsModule,
     OrdersModule,
@@ -47,8 +61,12 @@ import { GiftSetsModule } from './gift-sets/gift-sets.module';
     InventoryModule,
     ReviewsModule,
     NotificationsModule,
+
+    // AI modules
     AiAssistantModule,
     AiGiftStudioModule,
+
+    // Other modules
     AnalyticsModule,
     RecommendationsModule,
     SearchModule,

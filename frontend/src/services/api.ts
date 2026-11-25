@@ -9,6 +9,11 @@ const api = axios.create({
   },
 });
 
+// ========================================
+// REQUEST INTERCEPTOR
+// Tự động gửi JWT token nếu đã đăng nhập
+// ========================================
+
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('bloom_token');
@@ -22,13 +27,41 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
+// ========================================
+// RESPONSE INTERCEPTOR
+// Bóc lớp response.data của Backend
+// ========================================
+
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem('bloom_token');
-      localStorage.removeItem('bloom_user');
+  (response) => {
+    const body = response.data;
+
+    // Backend trả về:
+    // {
+    //   success: true,
+    //   data: {
+    //     accessToken: "...",
+    //     user: {...}
+    //   },
+    //   timestamp: "..."
+    // }
+
+    // Frontend chỉ cần phần data bên trong.
+    if (
+      body &&
+      typeof body === 'object' &&
+      body.success === true &&
+      'data' in body
+    ) {
+      response.data = body.data;
     }
+
+    return response;
+  },
+
+  (error) => {
+    // Xử lý lỗi từ Backend
+    // Không tự động xóa token tại đây.
 
     return Promise.reject(error);
   },

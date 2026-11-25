@@ -4,7 +4,7 @@ import { useCart } from '../../hooks/useCart';
 import CollectionsDropdown from './CollectionsDropdown';
 import ProductsDropdown from './ProductsDropdown';
 import UserMenu from './UserMenu';
-
+import SearchDropdown from './SearchDropdown';
 function Header() {
   const { totalItems } = useCart();
 
