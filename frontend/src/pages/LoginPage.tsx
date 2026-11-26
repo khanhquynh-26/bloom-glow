@@ -1,132 +1,90 @@
-
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
-import authService from '../services/auth.service';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import AuthShell from '../components/AuthShell';
 import { useAuth } from '../hooks/useAuth';
+import { getErrorMessage } from '../services/http';
 
-function LoginPage() {
+export default function LoginPage() {
+  const { login, isAuthenticated, isAdmin } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const from = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname;
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  // Đã đăng nhập (kể cả vừa đăng nhập xong): chuyển về trang đang xem dở, admin vào /admin
+  if (isAuthenticated) {
+    return <Navigate to={from ?? (isAdmin ? '/admin' : '/')} replace />;
+  }
+
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError('');
-
     if (!email.trim() || !password) {
-      setError('Vui lòng nhập email và mật khẩu.');
+      setError('Vui lòng nhập email và mật khẩu');
       return;
     }
-
+    setSubmitting(true);
     try {
-      setLoading(true);
+      const loggedInUser = await login({ email: email.trim(), password });
 
-const response = await authService.login({
-  email: email.trim(),
-  password,
-});
-
-if (!response.accessToken || !response.user) {
-  throw new Error('Backend trả về dữ liệu đăng nhập không hợp lệ');
-}
-
-login(response.user, response.accessToken);
-navigate('/');
-    } catch (err: any) {
-      setError(
-        err.response?.data?.message ||
-        'Email hoặc mật khẩu không chính xác.'
-      );
-    } finally {
-      setLoading(false);
+      // Chuyển trang dựa trên role
+      if (loggedInUser.role === 'ADMIN') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate(from ?? '/', { replace: true });
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
+      setSubmitting(false);
     }
-  };
+  }
 
   return (
-    <main className="auth-page">
-      <div className="auth-card">
-        <p className="auth-eyebrow">WELCOME BACK</p>
+    <AuthShell>
+      <h1 className="ba-auth__title">Đăng nhập</h1>
+      <p className="ba-auth__subtitle">Chào mừng bạn trở lại với Bloom &amp; Glow</p>
+      <form onSubmit={handleSubmit} noValidate>
+        {error && <div className="ba-alert">{error}</div>}
 
-        <h1>Chào mừng trở lại</h1>
-
-        <p className="auth-description">
-          Đăng nhập để tiếp tục khám phá những món quà xinh
-          tại Bloom & Glow.
-        </p>
-
-        <form onSubmit={handleSubmit}>
-          <div className="auth-field">
-            <label htmlFor="email">Email</label>
-
-            <div className="auth-input-wrapper">
-              <Mail size={18} />
-              <input
-                id="email"
-                type="email"
-                placeholder="Nhập địa chỉ email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="auth-field">
-            <label htmlFor="password">Mật khẩu</label>
-
-            <div className="auth-input-wrapper">
-              <LockKeyhole size={18} />
-
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Nhập mật khẩu"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="current-password"
-                required
-              />
-
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label="Hiện hoặc ẩn mật khẩu"
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
-
-          <div className="auth-forgot">
-            <Link to="/forgot-password">Quên mật khẩu?</Link>
-          </div>
-
-          {error && <div className="auth-error">{error}</div>}
-
-          <button
-            type="submit"
-            className="auth-submit"
-            disabled={loading}
-          >
-            {loading ? 'Đang đăng nhập...' : 'ĐĂNG NHẬP'}
-          </button>
-        </form>
-
-        <div className="auth-bottom">
-          Chưa có tài khoản?
-          <Link to="/register"> Đăng ký ngay</Link>
+        <div className="ba-field">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="ban@example.com"
+          />
         </div>
-      </div>
-    </main>
+
+        <div className="ba-field">
+          <label htmlFor="password">Mật khẩu</label>
+          <input
+            id="password"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        <Link to="/forgot-password" className="ba-auth__link">
+          Quên mật khẩu?
+        </Link>
+
+        <button type="submit" className="ba-btn ba-btn--block" disabled={submitting}>
+          {submitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
+        </button>
+      </form>
+
+      <p className="ba-auth__footer">
+        Chưa có tài khoản? <Link to="/register">Đăng ký</Link>
+      </p>
+    </AuthShell>
   );
 }
-
-export default LoginPage;

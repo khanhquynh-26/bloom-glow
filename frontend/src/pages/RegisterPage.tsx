@@ -1,199 +1,131 @@
-
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, LockKeyhole, Mail, Phone, User } from 'lucide-react';
-import authService from '../services/auth.service';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import AuthShell from '../components/AuthShell';
 import { useAuth } from '../hooks/useAuth';
+import { getErrorMessage } from '../services/http';
 
-function RegisterPage() {
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^(0|\+84)[0-9]{9}$/; // khớp với backend
+
+export default function RegisterPage() {
+  const { register, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  if (isAuthenticated) {
+    return <Navigate to={isAdmin ? '/admin' : '/'} replace />;
+  }
+
+  function validate(): string {
+    if (!fullName.trim()) return 'Vui lòng nhập họ tên';
+    if (!EMAIL_REGEX.test(email.trim())) return 'Email không hợp lệ';
+    if (phone.trim() && !PHONE_REGEX.test(phone.trim())) return 'Số điện thoại không hợp lệ';
+    if (password.length < 6) return 'Mật khẩu tối thiểu 6 ký tự';
+    if (password !== confirmPassword) return 'Mật khẩu nhập lại không khớp';
+    return '';
+  }
+
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    const message = validate();
+    if (message) {
+      setError(message);
+      return;
+    }
     setError('');
-
-    if (
-      !fullName.trim() ||
-      !email.trim() ||
-      !phone.trim() ||
-      !password
-    ) {
-      setError('Vui lòng nhập đầy đủ thông tin.');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Mật khẩu cần có ít nhất 6 ký tự.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp.');
-      return;
-    }
-
+    setSubmitting(true);
     try {
-      setLoading(true);
+      // Không gửi confirmPassword: backend từ chối các trường không có trong DTO
+      const newUser = await register({
+        fullName: fullName.trim(),
+        email: email.trim(),
+        password,
+        ...(phone.trim() ? { phone: phone.trim() } : {}),
+      });
 
-const response = await authService.register({
-  fullName: fullName.trim(),
-  email: email.trim(),
-  phone: phone.trim(),
-  password,
-});
-
-if (!response.accessToken || !response.user) {
-  throw new Error('Backend trả về dữ liệu đăng ký không hợp lệ');
-}
-
-login(response.user, response.accessToken);
-navigate('/');
-    } 
-    catch (err: any) {
-      setError(
-        err.response?.data?.message ||
-        'Đăng ký thất bại. Vui lòng thử lại.'
-      );
-    } finally {
-      setLoading(false);
+      // Đăng ký công khai luôn tạo CUSTOMER, nhưng vẫn điều hướng theo role cho thống nhất
+      if (newUser.role === 'ADMIN') {
+        navigate('/admin', { replace: true });
+      } else {
+        navigate('/', { replace: true });
+      }
+    } catch (err) {
+      setError(getErrorMessage(err));
+      setSubmitting(false);
     }
-  };
+  }
 
   return (
-    <main className="auth-page">
-      <div className="auth-card">
-        <p className="auth-eyebrow">JOIN OUR WORLD</p>
+    <AuthShell>
+      <h1 className="ba-auth__title">Tạo tài khoản</h1>
+      <p className="ba-auth__subtitle">Lưu địa chỉ giao hàng và theo dõi đơn hàng dễ dàng hơn</p>
+      <form onSubmit={handleSubmit} noValidate>
+        {error && <div className="ba-alert">{error}</div>}
 
-        <h1>Tạo tài khoản</h1>
-
-        <p className="auth-description">
-          Hãy tạo tài khoản để lưu giữ những món quà
-          và khoảnh khắc yêu thương.
-        </p>
-
-        <form onSubmit={handleSubmit}>
-          <div className="auth-field">
-            <label htmlFor="fullName">Họ và tên</label>
-
-            <div className="auth-input-wrapper">
-              <User size={18} />
-              <input
-                id="fullName"
-                type="text"
-                placeholder="Nhập họ và tên"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                autoComplete="name"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="auth-field">
-            <label htmlFor="email">Email</label>
-
-            <div className="auth-input-wrapper">
-              <Mail size={18} />
-              <input
-                id="email"
-                type="email"
-                placeholder="Nhập địa chỉ email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="auth-field">
-            <label htmlFor="phone">Số điện thoại</label>
-
-            <div className="auth-input-wrapper">
-              <Phone size={18} />
-              <input
-                id="phone"
-                type="tel"
-                placeholder="Nhập số điện thoại"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                autoComplete="tel"
-                required
-              />
-            </div>
-          </div>
-
-          <div className="auth-field">
-            <label htmlFor="password">Mật khẩu</label>
-
-            <div className="auth-input-wrapper">
-              <LockKeyhole size={18} />
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Ít nhất 6 ký tự"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                autoComplete="new-password"
-                required
-              />
-
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label="Hiện hoặc ẩn mật khẩu"
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </button>
-            </div>
-          </div>
-
-          <div className="auth-field">
-            <label htmlFor="confirmPassword">Xác nhận mật khẩu</label>
-
-            <div className="auth-input-wrapper">
-              <LockKeyhole size={18} />
-              <input
-                id="confirmPassword"
-                type="password"
-                placeholder="Nhập lại mật khẩu"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                autoComplete="new-password"
-                required
-              />
-            </div>
-          </div>
-
-          {error && <div className="auth-error">{error}</div>}
-
-          <button
-            type="submit"
-            className="auth-submit"
-            disabled={loading}
-          >
-            {loading ? 'Đang tạo tài khoản...' : 'ĐĂNG KÝ'}
-          </button>
-        </form>
-
-        <div className="auth-bottom">
-          Đã có tài khoản?
-          <Link to="/login"> Đăng nhập</Link>
+        <div className="ba-field">
+          <label htmlFor="fullName">Họ và tên</label>
+          <input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} />
         </div>
-      </div>
-    </main>
+
+        <div className="ba-field">
+          <label htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+
+        <div className="ba-field">
+          <label htmlFor="phone">Số điện thoại (không bắt buộc)</label>
+          <input
+            id="phone"
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="0901234567"
+          />
+        </div>
+
+        <div className="ba-field">
+          <label htmlFor="password">Mật khẩu</label>
+          <input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+
+        <div className="ba-field">
+          <label htmlFor="confirmPassword">Nhập lại mật khẩu</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            autoComplete="new-password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+          />
+        </div>
+
+        <button type="submit" className="ba-btn ba-btn--block" disabled={submitting}>
+          {submitting ? 'Đang tạo tài khoản...' : 'Đăng ký'}
+        </button>
+      </form>
+
+      <p className="ba-auth__footer">
+        Đã có tài khoản? <Link to="/login">Đăng nhập</Link>
+      </p>
+    </AuthShell>
   );
 }
-
-export default RegisterPage;

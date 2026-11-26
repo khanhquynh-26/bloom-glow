@@ -1,203 +1,61 @@
+import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
+import '../styles/auth-admin.css';
 
-import { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  Package,
-  Tags,
-  ShoppingBag,
-  Users,
-  BarChart3,
-  Menu,
-  X,
-  LogOut,
-  Store,
-  ChevronRight,
-  Sparkles,
-} from 'lucide-react';
-
-const menuItems = [
-  {
-    title: 'Tổng quan',
-    path: '/admin',
-    icon: LayoutDashboard,
-  },
-  {
-    title: 'Sản phẩm',
-    path: '/admin/products',
-    icon: Package,
-  },
-  {
-    title: 'Danh mục',
-    path: '/admin/categories',
-    icon: Tags,
-  },
-  {
-    title: 'Đơn hàng',
-    path: '/admin/orders',
-    icon: ShoppingBag,
-  },
-  {
-    title: 'Người dùng',
-    path: '/admin/users',
-    icon: Users,
-  },
-  {
-    title: 'Thống kê AI',
-    path: '/admin/analytics',
-    icon: BarChart3,
-  },
+const links = [
+  { to: '/admin', label: 'Tổng quan', end: true },
+  { to: '/admin/products', label: 'Sản phẩm', end: false },
+  { to: '/admin/categories', label: 'Danh mục', end: false },
+  { to: '/admin/orders', label: 'Đơn hàng', end: false },
+  { to: '/admin/users', label: 'Người dùng', end: false },
 ];
 
+/**
+ * Khung khu vực quản trị. Việc chặn người không phải admin do <RequireAuth adminOnly />
+ * bọc ngoài trong App.tsx đảm nhiệm.
+ */
 export default function AdminLayout() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem('bloom_token');
-    localStorage.removeItem('bloom_user');
-
-    navigate('/login');
-  };
+  function handleLogout() {
+    logout();
+    navigate('/login', { replace: true });
+  }
 
   return (
-    <div className="admin-layout">
-      {/* Mobile overlay */}
-      {mobileMenuOpen && (
-        <div
-          className="admin-overlay"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside
-        className={`admin-sidebar ${
-          sidebarOpen ? '' : 'collapsed'
-        } ${mobileMenuOpen ? 'mobile-open' : ''}`}
-      >
-        <div className="admin-brand">
-          <div className="admin-brand-icon">
-            <Store size={22} />
-          </div>
-
-          {sidebarOpen && (
-            <div className="admin-brand-text">
-              <strong>Bloom & Glow</strong>
-              <span>Administration</span>
-            </div>
-          )}
-
-          <button
-            className="admin-close-mobile"
-            onClick={() => setMobileMenuOpen(false)}
-            aria-label="Đóng menu"
-          >
-            <X size={20} />
-          </button>
+    <div className="ba-admin">
+      <aside className="ba-admin__sidebar">
+        <div className="ba-admin__brand">
+          <div className="ba-admin__logo">Bloom &amp; Glow</div>
+          <span className="ba-admin__sub">Quản trị</span>
         </div>
-
-        <div className="admin-menu-label">
-          {sidebarOpen && 'QUẢN LÝ HỆ THỐNG'}
-        </div>
-
-        <nav className="admin-nav">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <NavLink
-                key={item.path}
-                to={item.path}
-                end={item.path === '/admin'}
-                className={({ isActive }) =>
-                  `admin-nav-item ${isActive ? 'active' : ''}`
-                }
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <Icon size={19} />
-
-                {sidebarOpen && <span>{item.title}</span>}
-
-                {sidebarOpen && (
-                  <ChevronRight className="admin-nav-arrow" size={15} />
-                )}
-              </NavLink>
-            );
-          })}
+        <nav className="ba-admin__nav">
+          {links.map((link) => (
+            <NavLink key={link.to} to={link.to} end={link.end}>
+              {link.label}
+            </NavLink>
+          ))}
         </nav>
-
-        <div className="admin-sidebar-bottom">
-          <button
-            className="admin-nav-item"
-            onClick={() => navigate('/')}
-          >
-            <Store size={19} />
-            {sidebarOpen && <span>Xem cửa hàng</span>}
-          </button>
-
-          <button
-            className="admin-nav-item admin-logout"
-            onClick={handleLogout}
-          >
-            <LogOut size={19} />
-            {sidebarOpen && <span>Đăng xuất</span>}
-          </button>
-        </div>
       </aside>
 
-      {/* Main content */}
-      <div
-        className={`admin-main ${
-          sidebarOpen ? '' : 'sidebar-collapsed'
-        }`}
-      >
-        <header className="admin-header">
-          <div className="admin-header-left">
-            <button
-              className="admin-menu-toggle"
-              onClick={() => {
-                if (window.innerWidth <= 768) {
-                  setMobileMenuOpen(true);
-                } else {
-                  setSidebarOpen(!sidebarOpen);
-                }
-              }}
-              aria-label="Mở menu"
-            >
-              <Menu size={22} />
+      <div className="ba-admin__main">
+        <header className="ba-admin__header">
+          <span className="ba-admin__hello">
+            Xin chào, <strong>{user?.fullName}</strong>
+          </span>
+          <div className="ba-admin__actions">
+            <Link to="/" className="ba-btn ba-btn--ghost ba-btn--sm">
+              Về trang chủ
+            </Link>
+            <button type="button" className="ba-btn ba-btn--sm" onClick={handleLogout}>
+              Đăng xuất
             </button>
-
-            <div className="admin-header-title">
-              <span>Bloom & Glow</span>
-              <strong>Trang quản trị</strong>
-            </div>
-          </div>
-
-          <div className="admin-header-right">
-            <div className="admin-header-ai">
-              <Sparkles size={17} />
-              <span>AI Management</span>
-            </div>
-
-            <div className="admin-avatar">A</div>
-
-            <div className="admin-profile">
-              <strong>Administrator</strong>
-              <span>Quản trị viên</span>
-            </div>
           </div>
         </header>
-
-        <main className="admin-content">
+        <div className="ba-admin__content">
           <Outlet />
-        </main>
-
-        <footer className="admin-footer">
-          © 2026 Bloom & Glow. All rights reserved.
-        </footer>
+        </div>
       </div>
     </div>
   );
