@@ -9,7 +9,7 @@ export interface TrackUserEventInput {
 
 export interface UserEventRecord extends TrackUserEventInput {
   id: number;
-  createdAt: Date;
+  createdAt: string;
 }
 
 @Injectable()
@@ -24,7 +24,7 @@ export class UserEventsService {
       eventType: input.eventType,
       productId: input.productId,
       metadata: input.metadata,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     };
     this.events.push(record);
     return record;

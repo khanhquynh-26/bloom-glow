@@ -29,31 +29,40 @@ export class AiAssistantService {
     const activeProducts = sourceProducts.filter((p) => p.status === 'active');
 
     let matched = activeProducts;
-    let advice = 'Mình gợi ý vài sản phẩm phù hợp với nhu cầu của bạn.';
+    let advice = 'Mình gợi ý vài mẫu hoa tươi, nến thơm và set quà phù hợp với nhu cầu của bạn.';
 
     if (
-      text.includes('son') ||
-      text.includes('mắt') ||
-      text.includes('makeup') ||
-      text.includes('trang điểm')
+      text.includes('set') ||
+      text.includes('combo') ||
+      text.includes('quà') ||
+      text.includes('gift') ||
+      text.includes('tặng') ||
+      text.includes('hộp quà') ||
+      text.includes('sinh nhật') ||
+      text.includes('kỷ niệm')
+    ) {
+      matched = activeProducts.filter((p) => p.categoryId === 3);
+      advice = 'Với nhu cầu quà tặng ý nghĩa, bạn có thể tham khảo các set nến và hoa sau.';
+    } else if (
+      text.includes('nến') ||
+      text.includes('thơm') ||
+      text.includes('tinh dầu') ||
+      text.includes('mùi') ||
+      text.includes('hương') ||
+      text.includes('thư giãn') ||
+      text.includes('chill')
     ) {
       matched = activeProducts.filter((p) => p.categoryId === 2);
-      advice = 'Với nhu cầu trang điểm, bạn có thể tham khảo các sản phẩm makeup sau.';
+      advice = 'Với nhu cầu thư giãn và tạo hương thơm cho không gian, bạn có thể tham khảo các mẫu nến thơm sau.';
     } else if (
-      text.includes('da') ||
-      text.includes('chống nắng') ||
-      text.includes('tẩy trang') ||
-      text.includes('skincare') ||
-      text.includes('mụn') ||
-      text.includes('nhạy cảm') ||
-      text.includes('serum') ||
-      text.includes('rửa mặt')
+      text.includes('hoa') ||
+      text.includes('bó hoa') ||
+      text.includes('giỏ hoa') ||
+      text.includes('lẵng hoa') ||
+      text.includes('tươi')
     ) {
       matched = activeProducts.filter((p) => p.categoryId === 1);
-      advice = 'Với nhu cầu chăm sóc da, bạn có thể tham khảo các sản phẩm skincare sau.';
-    } else if (text.includes('quà') || text.includes('gift') || text.includes('tặng')) {
-      matched = activeProducts.filter((p) => p.categoryId === 3);
-      advice = 'Với nhu cầu quà tặng, bạn có thể tham khảo các set quà sau.';
+      advice = 'Với nhu cầu chọn hoa tươi trao gửi yêu thương, bạn có thể tham khảo các mẫu hoa sau.';
     }
 
     const matchK = text.match(/(\d+)\s*k/);
@@ -75,7 +84,7 @@ export class AiAssistantService {
           ? `${advice} Gợi ý: ${suggestedProducts
               .map((p) => `${p.name} (${Number(p.price).toLocaleString('vi-VN')}đ)`)
               .join(', ')}.`
-          : 'Hiện chưa có dữ liệu sản phẩm để gợi ý.',
+          : 'Hiện chưa có dữ liệu sản phẩm hoa tươi hoặc nến thơm để gợi ý.',
       suggestedProducts,
       timestamp: new Date().toISOString(),
     };
