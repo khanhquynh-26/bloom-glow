@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import MainLayout from '../layouts/MainLayout';
@@ -14,8 +13,9 @@ import CollectionDetailPage from '../pages/CollectionDetailPage';
 import WishlistPage from '../pages/WishlistPage';
 import GiftStudioPage from '../pages/GiftStudioPage';
 import SearchPage from '../pages/SearchPage';
+import AboutPage from '../pages/AboutPage';
 import NotFoundPage from '../pages/NotFoundPage';
-
+import ContactPage from '../pages/ContactPage';
 // Auth pages
 import LoginPage from '../pages/LoginPage';
 import RegisterPage from '../pages/RegisterPage';
@@ -123,6 +123,23 @@ function AppRoutes() {
           }
         />
 
+        {/* About */}
+        <Route
+          path="/about"
+          element={
+            <MainLayout>
+              <AboutPage />
+            </MainLayout>
+          }
+        />
+<Route
+  path="/contact"
+  element={
+    <MainLayout>
+      <ContactPage />
+    </MainLayout>
+  }
+/>
         {/* AUTH ROUTES */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
