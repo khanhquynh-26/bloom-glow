@@ -10,25 +10,18 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
 
-  // Tất cả API có tiền tố /api
   app.setGlobalPrefix('api');
-
-  // Cho phép Frontend truy cập Backend
   app.enableCors({
     origin: config.get<string>('FRONTEND_URL', 'http://localhost:5173'),
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,
   });
 
   app.useGlobalPipes(new AppValidationPipe());
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalInterceptors(
-    new LoggingInterceptor(),
-    new TransformInterceptor(),
-  );
+  app.useGlobalInterceptors(new LoggingInterceptor(), new TransformInterceptor());
 
-  const port = Number(config.get('PORT', 3000));
+  const port = Number(config.get('PORT', 3001));
   await app.listen(port);
-  console.log(`Backend running: http://localhost:${port}`);
+  console.log(`Bloom & Glow API đang chạy tại http://localhost:${port}/api`);
 }
 bootstrap();

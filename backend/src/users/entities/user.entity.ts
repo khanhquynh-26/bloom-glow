@@ -9,8 +9,8 @@ import {
 import { Address } from '../../addresses/entities/address.entity';
 
 export enum UserRole {
-  CUSTOMER = 'customer',
-  ADMIN = 'admin',
+  CUSTOMER = 'CUSTOMER',
+  ADMIN = 'ADMIN',
 }
 
 export enum UserStatus {

@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
   email       VARCHAR(255) NOT NULL,
   password    VARCHAR(255) NOT NULL,                 -- bcrypt hash
   phone       VARCHAR(20)  NULL,
-  role        ENUM('customer','admin')  NOT NULL DEFAULT 'customer',
+  role        ENUM('CUSTOMER','ADMIN')  NOT NULL DEFAULT 'CUSTOMER',
   status      ENUM('active','blocked')  NOT NULL DEFAULT 'active',
   created_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
   updated_at  DATETIME(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
@@ -39,4 +39,4 @@ CREATE TABLE IF NOT EXISTS addresses (
 ) ENGINE=InnoDB;
 
 -- Tạo tài khoản admin: đăng ký bình thường qua API rồi chạy:
--- UPDATE users SET role = 'admin' WHERE email = 'email-cua-ban@example.com';
+-- UPDATE users SET role = 'ADMIN' WHERE email = 'email-cua-ban@example.com';
